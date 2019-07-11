@@ -226,6 +226,8 @@ uint8_t me_legacy_ridx_max(uint16_t rate_map);
 uint8_t me_add_chan_ctx(uint8_t *p_chan_idx, struct scan_chan_tag *p_chan,
                         uint32_t center_freq1, uint32_t center_freq2, uint8_t ch_width);
 
+uint8_t me_get_rate(uint32_t rate_info);
+
 /// @}
 
 #endif  // _ME_UTILS_H_

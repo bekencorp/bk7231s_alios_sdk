@@ -91,7 +91,7 @@
 #define CFG_SUPPORT_CALIBRATION                    1
 #define CFG_SUPPORT_MANUAL_CALI                    1
 //tpc rf pa map power for bk7231u
-#define CFG_SUPPORT_TPC_PA_MAP                     0
+#define CFG_SUPPORT_TPC_PA_MAP                     1
 #endif
 
 /*section 8-----for netstack*/

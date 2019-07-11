@@ -68,6 +68,7 @@ UINT32 func_init(void)
     manual_cal_load_lpf_iq_tag_flash();
     manual_cal_load_xtal_tag_flash();
     #endif // (CFG_SOC_NAME != SOC_BK7231)
+    rwnx_cal_initial_calibration();
 #endif    
 
 #if CFG_SDIO

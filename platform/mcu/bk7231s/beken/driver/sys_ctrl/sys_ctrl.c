@@ -1798,6 +1798,12 @@ UINT32 sctrl_ctrl(UINT32 cmd, void *param)
         REG_WRITE(SCTRL_LOW_PWR_CLK, reg);
         break;
     
+    case CMD_SCTRL_SET_VDD_VALUE:
+    	reg = REG_READ(SCTRL_DIGTAL_VDD);
+    	reg &= (~(DIG_VDD_ACTIVE_MASK << DIG_VDD_ACTIVE_POSI));
+        reg |=((*(UINT32 *)param) << DIG_VDD_ACTIVE_POSI);
+    	REG_WRITE(SCTRL_DIGTAL_VDD, reg);
+        break;
     default:
         ret = SCTRL_FAILURE;
         break;

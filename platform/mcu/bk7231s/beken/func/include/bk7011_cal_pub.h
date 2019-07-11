@@ -47,6 +47,7 @@ extern void manual_cal_load_differ_tag_from_flash(void);
 extern void bk7011_micopwr_config_tssi_read_prepare(void);
 extern void bk7011_micopwr_tssi_read(void);
 extern void bk7011_micopwr_tssi_show(void);
+extern void rwnx_cal_set_reg_adda_ldo(UINT32 val);
 
 extern void manual_cal_tmp_pwr_init(UINT16 init_temp, UINT16 init_thre, UINT16 init_dist);
 extern void manual_cal_tmp_pwr_init_reg(UINT16 reg_mod, UINT16 reg_pa);
@@ -59,6 +60,18 @@ extern UINT32 manual_cal_load_adc_cali_flash(void);
 extern void rwnx_cal_set_reg_mod_pa(UINT16 reg_mod, UINT16 reg_pa);
 extern void rwnx_cal_do_temp_detect(UINT16 cur_val, UINT16 thre, UINT16 *last);
 extern void rwnx_cal_set_lpfcap_iq(UINT32 lpfcap_i, UINT32 lpfcap_q);
+extern void rwnx_cal_set_40M_extra_setting(UINT8 val);
+extern void rwnx_cal_set_40M_setting(void);
+
+
+extern void rwnx_cal_initial_calibration(void);
+
+extern UINT32 rwnx_tpc_pwr_idx_translate(UINT32 pwr_gain, UINT32 rate, UINT32 print_log );
+extern UINT32 rwnx_tpc_get_pwridx_by_rate(UINT32 rate, UINT32 print_log);
+extern void rwnx_use_tpc_set_pwr(void);
+extern void rwnx_no_use_tpc_set_pwr(void);
+extern UINT32 rwnx_is_tpc_bit_on(void);
+extern UINT32 rwnx_sys_is_enable_hw_tpc(void);
 
 
 #endif // _BK7011_CAL_PUB_H_

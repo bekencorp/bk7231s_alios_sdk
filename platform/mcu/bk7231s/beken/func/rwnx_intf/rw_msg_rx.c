@@ -37,6 +37,7 @@ rw_event_handler rw_event_handlers[RW_EVT_MAX] = {0};
 
 extern void app_set_sema(void);
 extern int get_security_type_from_ie(u8 *, int, u16);
+extern void rwnx_cal_set_txpwr(UINT32 pwr_gain, UINT32 grate);
 
 #if 1 /* scan result*/
 UINT8 *sr_malloc_result_item(UINT32 vies_len)
@@ -501,6 +502,9 @@ void rwnx_handle_recv_msg(struct ke_msg *rx_msg)
     case SM_DISCONNECT_IND:
         os_printf("SM_DISCONNECT_IND\r\n");
         mhdr_disconnect_ind(rx_msg);
+		extern UINT32 rwnx_sys_is_enable_hw_tpc(void);
+        if(rwnx_sys_is_enable_hw_tpc() == 0)
+            rwnx_cal_set_txpwr(20, 11);
         break;
 
 	case SM_CONNCTION_START_IND:

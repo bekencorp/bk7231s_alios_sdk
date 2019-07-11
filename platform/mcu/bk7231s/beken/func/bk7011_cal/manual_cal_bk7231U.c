@@ -353,9 +353,9 @@ const UINT16 shift_tab_n[1] = {0}; // for MCS7
 #else
 const UINT16 shift_tab_b[4] = {0, 0, 0, 0}; // 11M base,5.5M,2M,1M
 // 54M base -                 54M,48M,36M,24M,18M,12M,9M,6M
-const UINT16 shift_tab_g[8] = {0,  1,  1,  2,  4,  4,  4, 4}; // 54M base -  12M,9M,6M
-const UINT16 shift_tab_n20[8] = {0, 1, 1, 2, 4, 6, 6, 6}; // n20 mcs7base -  mcs0
-const UINT16 shift_tab_n40[8] = {0, 1, 1, 2, 4, 6, 6, 6}; // n40 mcs7base -  mcs0
+const UINT16 shift_tab_g[8] = {0,  1,  1,  1,  2,  2,  4, 4}; // 54M base -  12M,9M,6M
+const UINT16 shift_tab_n20[8] = {0, 1, 1, 2, 2, 4, 4, 4}; // n20 mcs7base -  mcs0
+const UINT16 shift_tab_n40[8] = {0, 1, 1, 2, 2, 4, 4, 4}; // n40 mcs7base -  mcs0
 #endif
 
 #define PWR_INIT_VAL        17
@@ -465,12 +465,12 @@ UINT32 manual_cal_get_pwr_idx_shift(UINT32 rate, UINT32 bandwidth, UINT32 *pwr_g
         }        
     }
 
-    MCAL_PRT("get_pwr_info: idx: %d, pwr:%d", shift[idex], *pwr_gain);
+    //MCAL_PRT("get_pwr_info: idx: %d, pwr:%d", shift[idex], *pwr_gain);
    
     idex = shift[idex] + *pwr_gain;
     *pwr_gain = (idex > 31)? 31: idex;
     
-    MCAL_PRT("--pwr:%d\r\n", *pwr_gain);
+    //MCAL_PRT("--pwr:%d\r\n", *pwr_gain);
     
     return ret;
 }
@@ -512,7 +512,7 @@ int manual_cal_get_txpwr(UINT32 rate, UINT32 channel, UINT32 bandwidth, UINT32 *
     }
 
     *pwr_gain = GET_TXPWR_GAIN(txpwr_tab_ptr);
-     MCAL_PRT("get txpwrtab gain:%d,ch:%d\r\n", *pwr_gain, channel+1);
+     //MCAL_PRT("get txpwrtab gain:%d,ch:%d\r\n", *pwr_gain, channel+1);
 	 
      return 1;
 }
@@ -1698,6 +1698,7 @@ void manual_cal_set_xtal(UINT32 xtal)
     if(xtal > PARAM_XTALH_CTUNE_MASK)
         param = PARAM_XTALH_CTUNE_MASK;
     
+    os_printf("xtal_cali:%d\r\n", xtal);
     sddev_control(SCTRL_DEV_NAME, CMD_SCTRL_SET_XTALH_CTUNE, &param);
     g_xtal = param;
 }

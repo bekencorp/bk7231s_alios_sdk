@@ -53,23 +53,6 @@
  * DEFINES
  ****************************************************************************************
  */
-
-#if CFG_SUPPORT_TPC_PA_MAP
-// Limit as defined per radio specifications
-#define PHY_TRIDENT_MAX_PWR_24G 20 // dBm
-#define PHY_TRIDENT_MIN_PWR_24G 5 // dBm
-
-#define PHY_TRIDENT_MAX_PWR_5G 22 // dBm
-#define PHY_TRIDENT_MIN_PWR_5G -9 // dBm
-
-#define PHY_TRIDENT_PA_GAIN_24G 0 // dBm
-#define PHY_TRIDENT_PA_GAIN_5G  26 // dBm
-
-#define PHY_TRIDENT_TX_GAIN_MIN -35 // dBm
-
-// To prevent distortion Limit pwr to 10 dBm
-#define PHY_TRIDENT_LIMIT_PWR    25 // dBm
-#else
 // Limit as defined per radio specifications
 #define PHY_TRIDENT_MAX_PWR_24G 25 // dBm
 #define PHY_TRIDENT_MIN_PWR_24G -6 // dBm
@@ -84,8 +67,6 @@
 
 // To prevent distortion Limit pwr to 10 dBm
 #define PHY_TRIDENT_LIMIT_PWR    10 // dBm
-#endif
-
 
 ///MAXIM radio SPI prescaler
 #define RF_SPI_PRESCALER  2//for until debug over

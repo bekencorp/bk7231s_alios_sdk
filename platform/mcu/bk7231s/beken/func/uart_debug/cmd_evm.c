@@ -20,7 +20,7 @@
 
 #include "ate_app.h"
 #include "param_config.h"
-
+#include "sys_ctrl_pub.h"
 typedef enum {
     TXEVM_E_STOP     = 0,
     TXEVM_E_REBOOT,
@@ -102,6 +102,7 @@ static UINT32 evm_translate_tx_rate(UINT32 rate)
 #endif
 
 /*txevm [-m mode] [-c channel] [-l packet-length] [-r physical-rate]*/
+UINT32 gmode = EVM_DEFUALT_MODE;
 int do_evm(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 {
 #if CFG_TX_EVM_TEST
@@ -126,6 +127,7 @@ int do_evm(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
     UINT32 arg_cnt = argc;
     UINT32 lpfcapcal_i = 0x80, lpfcapcal_q = 0x80;
     UINT32 xtal = 0x10;
+    UINT32 reg;
 
     if(arg_cnt == 1)
         return 0;
@@ -244,7 +246,16 @@ int do_evm(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
                     arg_cnt -= 1;
                     arg_id += 1;
                     os_printf("set pwr: gain:%d, unused:%d, rate:%d\r\n", pwr_mod, pwr_pa, g_rate);
+                    if((gmode == EVM_DEFUALT_MODE) || (gmode == EVM_VIAMAC_NOTPC_MODE))
                     rwnx_cal_set_txpwr(pwr_mod, g_rate);
+                    else {
+                        #if (CFG_SOC_NAME != SOC_BK7231)
+                        pwr_mod = rwnx_tpc_pwr_idx_translate(pwr_mod, g_rate, 1);
+                        evm_via_mac_set_power(pwr_mod);
+                        #else
+                        rwnx_cal_set_txpwr(pwr_mod, g_rate);
+                        #endif
+                    }
                     return 0;
                 }
 
@@ -342,7 +353,8 @@ int do_evm(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 
     /*step1, parameter check*/
     if(!(((1 == mode)
-            || (0 == mode))
+            || (0 == mode)
+            || (2 == mode))
             && ((1 == bandwidth)
                 || (0 == bandwidth))
             && (modul_format <= 3)
@@ -376,8 +388,14 @@ int do_evm(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
     }
 
     /*step2, handle*/
-    if(mode)
+    //sys_ctrl_0x42[6:4]=SCTRL_DIGTAL_VDD=5
+    reg = 5;
+    sddev_control(SCTRL_DEV_NAME, CMD_SCTRL_SET_VDD_VALUE, &reg);
+        
+    rwnx_cal_set_reg_adda_ldo(1);
+    if(mode == EVM_DEFUALT_MODE)
     {
+        rwnx_no_use_tpc_set_pwr();
         mdm_scramblerctrl_set(0x95);
         evm_bypass_mac_set_tx_data_length(modul_format, packet_len);
         if(rate <= 54) {
@@ -407,14 +425,47 @@ int do_evm(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
         }
         
     }
-    else
+    else if(mode == EVM_VIAMAC_TPC_MODE)
     {
-        evm_via_mac_set_rate((HW_RATE_E)rate, 1);
-        evm_set_bandwidth(bandwidth);
-        evm_via_mac_set_channel(channel);
+        UINT32 h_rate = evm_translate_tx_rate(rate), txpwr;
 
+        evm_stop_bypass_mac();
+
+        rwnx_use_tpc_set_pwr();
+
+        evm_via_mac_set_bandwidth(bandwidth);
+        evm_via_mac_set_channel(channel);
+        evm_via_mac_init();
+            
+        evm_via_mac_set_rate((HW_RATE_E)h_rate, modul_format, guard_i_tpye);
+            
+        txpwr = rwnx_tpc_get_pwridx_by_rate(h_rate, 1);
+        evm_via_mac_set_power(txpwr);
+            
         evm_via_mac_begin();
     }
+	else if(mode == EVM_VIAMAC_NOTPC_MODE)
+    {
+        UINT32 h_rate = evm_translate_tx_rate(rate);
+
+        evm_stop_bypass_mac();
+
+        rwnx_no_use_tpc_set_pwr();
+
+        evm_via_mac_set_bandwidth(bandwidth);
+        evm_via_mac_set_channel(channel);
+        evm_via_mac_init();
+            
+        evm_via_mac_set_rate((HW_RATE_E)h_rate, modul_format, guard_i_tpye);
+
+#if CFG_SUPPORT_CALIBRATION
+        CHECK_OPERATE_RF_REG_IF_IN_SLEEP();
+        rwnx_cal_set_txpwr_by_rate(evm_translate_tx_rate(rate), test_mode);
+        CHECK_OPERATE_RF_REG_IF_IN_SLEEP_END();
+#endif
+        evm_via_mac_begin();
+    }
+    gmode = mode;
         
 #endif // CFG_TX_EVM_TEST 
 
