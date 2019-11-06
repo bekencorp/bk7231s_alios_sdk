@@ -223,6 +223,9 @@ typedef struct vif_addcfg_st {
     u8 adv; 
 } VIF_ADDCFG_ST, *VIF_ADDCFG_PTR;
 
+#define MONITOR_FILTER_MUL_BRD_CAST     (1U << 0)
+#define MONITOR_FILTER_DUPL_FRM         (1U << 1)
+
 typedef void (*monitor_cb_t)(uint8_t *data, int len, wifi_link_info_t *info);
 
 /**
@@ -328,6 +331,12 @@ OSStatus bk_wlan_get_link_status(LinkStatusTypeDef *outStatus);
  */
 void bk_wlan_start_scan(void);
 
+/**
+ * bit0:1:mulicast_brdcast is not filte
+ * bit1:1: duplicate frame is not filte
+**/
+extern void bk_wlan_set_monitor_filter(unsigned char filter);
+
 /** @brief  Start wifi monitor mode
  * 
  *  @detail This function disconnect wifi station and softAP. 
@@ -364,6 +373,7 @@ monitor_cb_t bk_wlan_get_monitor_cb(void);
 monitor_cb_t bk_wlan_get_bcn_cb(void);
 void bk_wlan_enable_lsig(void);
 void bk_wlan_disable_lsig(void);
+int bk_wlan_monitor_filter(unsigned char filter_type);
 int bk_wlan_is_monitor_mode(void);
 uint32_t bk_sta_cipher_is_open(void);
 uint32_t bk_sta_cipher_is_wep(void);
